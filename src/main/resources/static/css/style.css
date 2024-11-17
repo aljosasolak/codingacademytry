@@ -1,0 +1,47 @@
+* {
+ box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0.75rem;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    background: #F9F6EE;
+
+}
+.logo-wrapper {
+    margin: 1rem;
+    padding: 0.5rem;
+    display: flex;
+    justify-content: center;
+    width: 50vw;
+    height: 50vw;
+    max-width: 900px;
+    max-height: 900px;
+    background: linear-gradient(45deg, #ffffff, #162a3d);
+    background-size: 400% 400%;
+    animation: gradient-animation 5s linear infinite;
+    border-radius: 50%;
+}
+
+#logoImg {
+   max-width: 100%;
+   max-height: 100%;
+   border-radius: 50%;
+   object-fit: cover;
+}
+
+@keyframes gradient-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+    23% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
+}
