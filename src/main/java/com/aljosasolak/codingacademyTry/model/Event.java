@@ -15,6 +15,7 @@ public class Event {
     private int eventId;
     private int season;
     private String status;
+    @Column(name = "time_venue_UTC")
     private LocalDateTime timeVenueUTC;
     private LocalDateTime dateVenue;
 
@@ -30,7 +31,7 @@ public class Event {
     @JoinColumn(name = "sport_id", referencedColumnName = "sport_id")
     private Sport sport;
 
-    @Column(name = "team_id", insertable=false, updatable=false)
+    @Column(name = "home_team_id", insertable=false, updatable=false)
     private int homeTeamId;
     @ManyToOne
     @JoinColumn(name = "home_team_id", referencedColumnName = "team_id")
@@ -39,7 +40,7 @@ public class Event {
     @Column(name = "away_team_id", insertable=false, updatable=false)
     private int awayTeamId;
     @ManyToOne
-    @JoinColumn(name = "team_id", referencedColumnName = "team_id")
+    @JoinColumn(name = "away_team_id", referencedColumnName = "team_id")
     private Team awayTeam;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -50,11 +51,9 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "stage_id", referencedColumnName = "stage_id")
     private Stage stage;
-    private int TeamGroup;
-    private String OriginCompetitionId;
-    private String OriginCompetitionName;
-    private boolean OnlineAvailable;
-    private boolean TicketsAvailable;
-
-
+    private int teamGroup;
+    private String originCompetitionId;
+    private String originCompetitionName;
+    private int onlineAvailable;
+    private int ticketsAvailable;
 }

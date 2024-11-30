@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/event.css}">
+</head>
+<body style="background-color:#F9F6EE">
+<!-- The navigation bar -->
+<div class="container-fluid bg-light">
+    <div class="row align-items-center">
+        <div class="col my-2 p-2 d-flex justify-content-center">
+            <a href="/">
+                <div class="logo-wrapper">
+                    <img class="rounded-circle" th:src="@{/images/logo.jpg}" alt="RadArcademy logo"
+                         aria-label="RadArcademy logo" title="View the logo"
+                         id="logoImgNavBar">
+                </div>
+            </a>
+        </div>
+        <div class="col">
+            <a class="font-weight-bold" href="/events">EVENTS</a>
+        </div>
+        <div class="col font-weight-bold">
+            <a href="/watch">WATCH</a>
+        </div>
+        <div class="col font-weight-bold">
+            <a href="/bet">BET</a>
+        </div>
+        <div class="col font-weight-bold">
+            <a href="/tickets">TICKETS</a>
+        </div>
+        <div class="col font-weight-bold">
+            <a href="/results">RESULTS</a>
+        </div>
+    </div>
+</div>
+<!-- The Calendar Content -->
+<div class="m-5">
+    <div class="d-flex justify-content-center mb-4">
+        <h1>Events</h1>
+    </div>
+    <div class="m-3 p-2">
+        <div class="d-flex justify-content-between">
+            <input type="text" name="searchText" id="searchText" class="w-50 input-field"
+                   placeholder="Filter by date or team">
+            <a href="/events/create" class="btn btn-primary">Create Event</a>
+        </div>
+    </div>
+    <table id="tableEvents" class="table table-hover">
+        <thead>
+        <tr>
+            <td></td>
+            <td>Date</td>
+            <td>Time</td>
+            <td>Sport</td>
+            <td>Teams</td>
+            <td>Stage</td>
+            <td>Venue</td>
+            <td>Watch Online</td>
+            <td>Tickets Available</td>
+            <td>Delete event</td>
+        </tr>
+        </thead>
+        <tbody id="tableEventsBody" class="table-group-divider">
+        <tr th:each="event : ${events}">
+            <td></td>
+            <td th:text="${#temporals.format(event.dateVenue, 'E, dd.MM.yyyy') ?: 'N/A'}"></td>
+            <td th:text="${#temporals.format(event.timeVenueUTC, 'HH:mm')}"></td>
+            <td th:text="${event.sport.sport}"></td>
+            <td th:text="${event.homeTeam.teamName} + ' vs ' + ${event.awayTeam.teamName}"></td>
+            <td th:text="${event.stage.stageName}"></td>
+            <td th:text="${event.venue.venueName}"></td>
+            <div>
+                <div th:if="${event.onlineAvailable == 1}">
+                    <td>
+                        <a href="/watch"><img th:src="@{/icons/available-icon.png}" alt="Available online"
+                                              aria-label="Available online" title="Watching online available"></a>
+                    </td>
+                </div>
+                <div th:unless="${event.onlineAvailable != 0}">
+                    <td>
+                        <img th:src="@{/icons/unavailable-icon.png}" alt="Not available online"
+                             aria-label="Not vailable online" title="Watching online not available">
+                    </td>
+                </div>
+            </div>
+            <div th:if="${event.ticketsAvailable == 1}">
+                <td>
+                    <a href="/tickets"><img th:src="@{/icons/available-icon.png}" alt="Ticktets vailable"
+                                            aria-label="Tickets available" title="Tickets available"></a>
+                </td>
+            </div>
+            <div th:unless="${event.ticketsAvailable != 0}">
+                <td>
+                    <img th:src="@{/icons/unavailable-icon.png}" alt="Not available online"
+                         aria-label="Not vailable online" title="Tickets not available">
+                </td>
+            </div>
+            <td>
+                <a onclick="return confirm('Are you sure you want to delete this client?')"
+                   th:href="@{/events/delete(id=${event.eventId})}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+        var events = /*[[${events}]]*/;
+    /*]]>*/
+
+    $('#searchText').on('keyup',function(){
+        var value = $(this).val();
+
+        //Get filtered events list
+        var data = FilterFunction(value, events);
+
+        //Clear the table  and rebuild using new filtered data
+        rebuildTable(data)
+
+    });
+    //Filter function to define a filter string to compare the table to
+    function FilterFunction(value, data) {
+        var filteredData = [];
+        for(var i=0; i<data.length; i++) {
+        var homeTeam = data[i].homeTeam.teamName.toLowerCase()
+        var awayTeamName = data[i].awayTeam.teamName.toLowerCase();
+        var dateVenue = data[i].dateVenue.toLowerCase();
+        var sport = data[i].sport.sport.toLowerCase();
+
+        if(homeTeam.includes(value) || awayTeamName.includes(value) || dateVenue.includes(value) || sport.includes(value)){
+            filteredData.push(data[i]);
+            }
+        }
+        return filteredData;
+    }
+
+    //Rebuild function - after having defined the filter string, the table of sport events will be repopulated with filtered results
+    function rebuildTable(data){
+        var tableBody = document.getElementById('tableEventsBody')
+        tableBody.innerHTML='';
+        for(var i=0; i<data.length; i++) {
+            var row = `<tr>
+                        <td></td>
+                        <td>${new Date(data[i].dateVenue).toLocaleDateString('en-GB', {
+                        weekday: 'short',
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    })}</td>
+                        <td>${new Date(data[i].timeVenueUTC).toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</td>
+                        <td>${data[i].sport.sport}</td>
+                        <td>${data[i].homeTeam.teamName} ${' '} ${data[i].awayTeam.teamName}</td>
+                        <td>${data[i].stage.stageName}</td>
+                        <td>${data[i].venue.venueName}</td>
+                        <td>
+                            ${data[i].onlineAvailable === 1
+                                ? `<a href="/watch"><img src="/icons/available-icon.png" alt="Available online" title="Watching online available"></a>`
+                                : `<img src="/icons/unavailable-icon.png" alt="Not available online" title="Watching online not available">`}
+                        </td>
+                        <td>
+                            ${data[i].ticketsAvailable === 1
+                                ? `<a href="/tickets"><img src="/icons/available-icon.png" alt="Tickets available" title="Tickets available"></a>`
+                                : `<img src="/icons/unavailable-icon.png" alt="Tickets not available" title="Tickets not available">`}
+                        </td>
+                    <td style="white-space:nowrap">
+                        <a class="btn btn-danger btn-sm" href="/events/delete?id=${data[i].eventId}"
+                           onclick="return confirm('Are you sure you want to delete this client?')">Delete</a>
+                    </td>
+                    </tr>`;
+        tableBody.innerHTML += row;
+            }
+    }
+</script>
+
+
+</body>
+</html>
