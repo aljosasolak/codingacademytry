@@ -1,0 +1,234 @@
+CREATE TABLE events (
+	event_id INT PRIMARY KEY,
+	season YEAR NOT NULL,
+	status VARCHAR(20) NOT NULL,
+	time_venue_utc DATETIME NOT NULL,
+	date_venue DATETIME NOT NULL,
+	venue_id INT NULL,
+	sport_id INT NULL,
+	home_team_id INT NOT NULL,
+	away_team_id INT NOT NULL,
+	result_id INT NOT NULL,
+	stage_id INT NOT NULL,
+	team_group TINYINT, 
+	origin_competition_id VARCHAR(50),
+	origin_competition_name VARCHAR(50),
+	online_available TINYINT NOT NULL,
+	tickets_available TINYINT NOT NULL
+);
+
+CREATE TABLE venues (
+	venue_id INT PRIMARY KEY,
+	venue_name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE sports (
+	sport_id INT PRIMARY KEY,
+	sport VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE teams (
+	team_id INT PRIMARY KEY,
+	team_name VARCHAR(50) NOT NULL,
+	official_team_name VARCHAR(150) NOT NULL,
+	slug VARCHAR(150),
+	abbreviation VARCHAR(15),
+	team_country_code VARCHAR(3) NOT NULL,
+	stage_position VARCHAR(50) NULL
+);
+
+CREATE TABLE results(
+	result_id INT PRIMARY KEY,
+	home_goals TINYINT NOT NULL,
+	away_goals TINYINT NOT NULL, 
+	winner VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE stages (
+	stage_id INT PRIMARY KEY,
+	stage_name VARCHAR(50) NOT NULL,
+	ordering TINYINT
+);
+
+CREATE TABLE tickets(
+	ticket_id INT PRIMARY KEY,
+	price DECIMAL(7,2) NOT NULL,
+	category VARCHAR(50) NOT NULL,
+	is_sold TINYINT NOT NULL,
+	event_id CHAR(36) 	
+);
+
+CREATE TABLE countries (
+	team_country_code CHAR(3) PRIMARY KEY,
+	country VARCHAR(50)
+);
+
+
+ALTER TABLE events
+ADD CONSTRAINT _fk_events_venues FOREIGN KEY (venue_id) REFERENCES venues(venue_id);
+
+ALTER TABLE events
+ADD CONSTRAINT _fk_events_sports FOREIGN KEY (sport_id) REFERENCES sports(sport_id);
+
+ALTER TABLE events
+ADD CONSTRAINT _fk_events_teams_home_team FOREIGN KEY (home_team_id) REFERENCES teams(team_id);
+
+ALTER TABLE events
+ADD CONSTRAINT _fk_events_teams_away_team FOREIGN KEY (away_team_id) REFERENCES teams(team_id);
+
+ALTER TABLE events
+ADD CONSTRAINT _fk_events_rsults FOREIGN KEY (result_id) REFERENCES results(result_id);
+
+ALTER TABLE events
+ADD CONSTRAINT _fk_events_stages FOREIGN KEY (stage_id) REFERENCES stages(stage_id);
+
+
+ALTER TABLE events DROP CONSTRAINT _fk_events_sports;
+alter table sports modify column sport_id integer not null;
+alter table events modify column sport_id integer not null;
+ALTER TABLE events
+ADD CONSTRAINT _fk_events_sports FOREIGN KEY (sport_id) REFERENCES sports(sport_id);
+
+ALTER TABLE events
+MODIFY COLUMN result_id INT NULL;
+
+ALTER TABLE events AUTO_INCREMENT=2;
+
+SELECT * FROM sportcalendartry.events;
+
+INSERT INTO sportcalendartry.venues VALUES (
+	1, 'NouCamp'
+);
+
+INSERT INTO sportcalendartry.sports VALUES (
+	1, 'Football'
+);
+
+INSERT INTO sportcalendartry.teams(team_id, team_name, official_team_name, team_country_code) VALUES (
+	1, 'Real Madrid', 'Real Madrid', 'ESP'
+);
+
+INSERT INTO sportcalendartry.teams(team_id, team_name, official_team_name, team_country_code) VALUES (
+	2, 'FC Barcelona', 'FC Barcelona', 'ESP'
+);
+
+INSERT INTO sportcalendartry.results VALUES (
+	1, 2, 1, 'Real Madrid'
+);
+
+INSERT INTO sportcalendartry.stages VALUES (
+	1, 'Round of 16', 4
+);
+
+INSERT INTO sportcalendartry.events(events.event_id, events.season, events.status, events.time_venue_utc, events.date_venue, events.venue_id, events.sport_id, events.home_team_id,
+									events.away_team_id, events.result_id, events.stage_id, events.online_available, events.tickets_available, events.team_group) VALUES (
+1, 2024, 'scheduled', '19:00:00', '2024-12-26', 1, 1, 1, 2, 1, 1, 0, 1, 1
+);
+
+
+SELECT * FROM sportcalendartry.events;
+SELECT * FROM sportcalendartry.venues;
+
+
+
+INSERT INTO sportcalendartry.teams(team_id, team_name, official_team_name, team_country_code) VALUES (
+	1, 'Real Madrid', 'Real Madrid', 'ESP'
+);
+
+INSERT INTO sportcalendartry.teams(team_id, team_name, official_team_name, team_country_code) VALUES (
+	2, 'FC Barcelona', 'FC Barcelona', 'ESP'
+);
+
+INSERT INTO sportcalendartry.results VALUES (
+	1, 2, 1, 'Real Madrid'
+);
+
+INSERT INTO sportcalendartry.stages VALUES (
+	1, 'Round of 16', 4
+);
+
+INSERT INTO sportcalendartry.sports VALUES
+	(2, 'Cricket'),
+    (3, 'Hockey'),
+    (4, 'Tennis'),
+    (5, 'Volleyball'),
+    (6, 'Baseball'),
+    (7, 'Rugby'),
+    (8, 'Golf'),
+    (9, 'Snooker'),
+    (10, 'Basketball'),
+    (11, 'Table Tennis'),
+    (12, 'Badminton'),
+    (13, 'Boxing'),
+    (14, 'Ice Hockey'),
+    (15, 'Fencing'),
+    (16, 'Water Polo'),
+    (17, 'Squash');
+    
+SELECT * FROM sportcalendartry.sports;
+    
+INSERT INTO sportcalendartry.stages VALUES 
+	(2, 'Round of 8', 3),
+	(3, 'Round of 4', 2),
+	(4, 'Round of 2', 1),
+	(5, 'Round of 1', 0);
+    
+INSERT INTO sportcalendartry.teams(team_id, team_name, official_team_name, team_country_code) VALUES 
+(3, 'Los Angeles Lakers', 'Los Angeles Lakers Basketball Team', 'USA'),
+(4, 'Chicago Bulls', 'Chicago Bulls Basketball Team', 'USA'),
+(5, 'Toronto Raptors', 'Toronto Raptors Basketball Team', 'CAN'),
+(6, 'Boston Celtics', 'Boston Celtics Basketball Team', 'USA'),
+(7, 'Golden State Warriors', 'Golden State Warriors Basketball Team', 'USA'),
+(8, 'Miami Heat', 'Miami Heat Basketball Team', 'USA'),
+(9, 'FK Sturm', 'Fussballklub Sturm Graz', 'AUT'),
+(10, 'Inter Milan', 'Inter Milan', 'ITA'),
+(11, 'Manchester United', 'Manchester United Football Club', 'ENG'),
+(12, 'Paris Saint-Germain', 'Paris Saint-Germain Football Club', 'FRA'),
+(13, 'Bayern Munich', 'Fußball-Club Bayern München', 'GER'),
+(14, 'Juventus', 'Juventus Football Club', 'ITA'),
+(15, 'New Zealand All Blacks', 'New Zealand National Rugby Team', 'NZL'),
+(16, 'England Rugby', 'England National Rugby Team', 'ENG'),
+(17, 'Glasgow Warriors', 'Glasgow Rugby Warriors', 'SCO'),
+(18, 'South Africa Springboks', 'South Africa National Rugby Team', 'RSA'),
+(19, 'Australia Wallabies', 'Australia National Rugby Team', 'AUS'),
+(20, 'France Les Bleus', 'France National Rugby Team', 'FRA'),
+(21, 'Mumbai Indians', 'Mumbai Indians Cricket Team', 'IND'),
+(22, 'Sydney Sixers', 'Sydney Sixers Cricket Team', 'AUS'),
+(23, 'Chennai Super Kings', 'Chennai Super Kings Cricket Team', 'IND'),
+(24, 'England Lions', 'England National Cricket Team', 'ENG'),
+(25, 'South Africa Proteas', 'South Africa National Cricket Team', 'RSA'),
+(26, 'Pakistan Shaheens', 'Pakistan National Cricket Team', 'PAK');
+
+INSERT INTO sportcalendartry.venues VALUES 
+-- Football Venues
+(2, 'Old Trafford'),
+(3, 'Anfield'),
+(4, 'Allianz Arena'),
+(5, 'Santiago Bernabéu'),
+(6, 'Stade de France'),
+-- Cricket Venues
+(7, 'Eden Gardens'),
+(8, 'Melbourne Cricket Ground'),
+(9, 'Lords'),
+(10, 'The Oval'),
+(11, 'Wankhede Stadium'),
+-- Basketball Venues
+(12, 'Staples Center'),
+(13, 'Madison Square Garden'),
+(14, 'TD Garden'),
+(15, 'United Center'),
+(16, 'Scotiabank Arena'),
+-- Rugby Venues
+(17, 'Twickenham Stadium'),
+(18, 'Ellis Park'),
+(19, 'Aviva Stadium'),
+(20, 'ANZ Stadium'),
+(21, 'Principality Stadium'),
+-- Tennis Venues
+(22, 'Wimbledon Centre Court'),
+(23, 'Rod Laver Arena'),
+(24, 'Arthur Ashe Stadium'),
+(25, 'Philippe-Chatrier Court'),
+(26, 'Indian Wells Tennis Garden');
+
+
